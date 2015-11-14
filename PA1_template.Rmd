@@ -1,22 +1,55 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+author: QIAO Yuchen
 output: 
-  html_document:
-    keep_md: true
+    html_document:
+        keep_md: true
 ---
 
 
 ## Loading and preprocessing the data
-
-
+Firsly ,let's read the data in the csv file and check the data. I read the file into a data.frame and I also need to make the date column into right type. 
+``` {r dataReadAndProcess, echo=TRUE}
+# read the data into a data.framework
+data <- read.csv(file = "activity.csv", sep = ",", dec = ".", header = TRUE)
+# check the date colum into right type
+data[, 2] <- as.Date(data[, 2], format = "%Y-%m-%d")
+# show the header of the processed data
+str(data)
+head(data)
+```
 
 ## What is mean total number of steps taken per day?
+In this part, a histograms is provided to answer the question in the directions. This histogram will show the total number of the steps taken each day. The mean and median of the total number of steps taken per day are also calculated in the R code.
 
+``` {r meanNumberSteps, echo = TRUE}
+# calculation of the total of steps taken each unique day
+uniqueDays <- unique(data$date)
+uniqueDays
+totalStepsPerDay <- tapply(data$steps, data$date, FUN=sum, na.rm = TRUE)
+totalStepsPerDay
+# draw the plot of the histogram
+with(data, plot(uniqueDays, totalStepsPerDay, type="h", main = "Total numbers of steps taken each day", xlab = "Date from 2012-10-01 to 2012-11-30", ylab = "Total number of steps taken per day", lwd = 4, xaxt = "n"))
+axis.Date(1, at = seq(min(data$date), max(data$date), by = "1 day"), format = "%Y-%m")
 
+# mean of the total number of steps taken per day
+mean(totalStepsPerDay)
+# median of the total number of steps taken per day
+median(totalStepsPerDay)
+```
 
 ## What is the average daily activity pattern?
+In this part, 
+``` {r activityPattern, echo=TRUE}
+#stepsPerInterval <- aggregate(formula = steps ~ interval, data = data, FUN = mean, na.rm = TRUE)
+#plot(stepsPerInterval$interval, stepsPerInterval$steps, type = "l", lwd = 4, main = "", xlab = "", ylab = "")
+stepsPerInterval <- tapply(data$steps, data$interval, FUN = mean, na.rm = TRUE)
+uniqueInterval <- unique(data$interval)
+plot(uniqueInterval, stepsPerInterval, type = "l", lwd = 3, main = "Average steps taken per interval across all days", xlab = "Interval", ylab = "Average number of steps taken per interval")
 
-
+# The interval with maximum of steps and the maximum are shown below
+stepsPerInterval[which.max(stepsPerInterval)]
+```
 
 ## Imputing missing values
 
